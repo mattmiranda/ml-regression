@@ -31,6 +31,7 @@ python main.py
 * I found out that every date corresponds to a Sunday and the year is fixed as 2018. So I dropped those columns as they are not useful. 
 * By plotting a correlation heatmap I could notice correlation between volume and Boxes_S, probably because most of the volume comes from small boxes. I also found that the Price is slightly correlated to Boxes_XL, probably because larger boxes are more expensive.
 * There is also some correlation between region and price. Kimchi is sold at different prices in different regions.
+* Because there are not too many features I decided not to use PCA for this dataset.
 * The dataset has a categorical variables (Region) that needs to be encoded. I use one hot encoding for that.
 * In order to scale/normalize the numerical features (such as Volume, Boxes_S, Boxes_L and Boxes_XL):
     * Instantiate OneHotEncoder and the normalizer (I tested StandardNormalizer and QuantileTransformer)
