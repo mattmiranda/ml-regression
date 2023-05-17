@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import PowerTransformer, QuantileTransformer
+from sklearn.preprocessing import QuantileTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import make_column_transformer
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn import tree
 from sklearn import neighbors
@@ -55,16 +55,16 @@ print(
 # Plot distribution
 plt.figure(figsize=[16, 8])
 plt.subplot(2, 2, 1)
-sns.distplot(df["Price"])
+sns.histplot(df["Price"], bins=50, kde=True)
 
 plt.subplot(2, 2, 2)
-sns.distplot(df["Volume"])
+sns.histplot(df["Volume"], bins=50, kde=True)
 
 plt.subplot(2, 2, 3)
-sns.distplot(df["Boxes_S"])
+sns.histplot(df["Boxes_S"], bins=50, kde=True)
 
 plt.subplot(2, 2, 4)
-sns.distplot(df["Boxes_L"])
+sns.histplot(df["Boxes_L"], bins=50, kde=True)
 plt.title("Distribution Plots")
 
 plt.show()
@@ -78,7 +78,7 @@ df["season"] = df.apply(
     else (1 if x["month"] in [3, 4, 5] else (2 if x["month"] in [6, 7, 8] else 4)),
     axis=1,
 )
-df = df.drop(["Date", "Boxes_T"], axis=1)
+df = df.drop(["Date"], axis=1)
 
 X = df.drop(["Price"], axis=1)
 y = df["Price"]
@@ -111,7 +111,7 @@ def run_models(models, X_train, y_train, X_test, y_test):
 
 
 # One hot encoding to encode nominal variabe "Region"
-one_hot_enc = OneHotEncoder(sparse=False)
+one_hot_enc = OneHotEncoder(sparse_output=False)
 
 # Normalize other numerical features with QuantileTransformer
 quant_trans = QuantileTransformer(n_quantiles=500, output_distribution="normal")
@@ -119,7 +119,7 @@ quant_trans = QuantileTransformer(n_quantiles=500, output_distribution="normal")
 # Make column transformer to make it easier to create scikit-learn pipeline later
 col_trans = make_column_transformer(
     (one_hot_enc, ["Region"]),
-    (quant_trans, ["Volume", "Boxes_S", "Boxes_L", "Boxes_XL"]),
+    (quant_trans, ["Volume", "Boxes_T", "Boxes_S", "Boxes_L", "Boxes_XL"]),
 )
 
 # Create pipelines from all models
@@ -155,6 +155,11 @@ models.append({"name": "KNN", "pipeline": knn_pipeline})
 svm = SVR()
 svm_pipeline = make_pipeline(col_trans, svm)
 models.append({"name": "SVM", "pipeline": svm_pipeline})
+
+# SGDRegression
+sgd = SGDRegressor()
+sgd_pipeline = make_pipeline(col_trans, sgd)
+models.append({"name": "SGD", "pipeline": sgd_pipeline})
 
 results = run_models(models, X_train, y_train, X_test, y_test)
 print("Result comparison between models using Quantile Transform")

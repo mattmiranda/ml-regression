@@ -38,7 +38,7 @@ python main.py
     * Make column transformer specifying the transform and target columns.
     * Then I could simply use make_pipeline passing the column transformer and the model to be trained.
 * run_models is a helper function I created to fit (train) and evaluate the performance of several models, by calculating and returning the mean absolute error and root mean squared error.
-* As you can see from the output table below, the result indicates that a Support Vector Machine (SVM) seems to perform best with this dataset. This could be attributed to the fact that SVMs are designed to generate more complex decision boundaries.
+* As you can see from the output table below, the result indicates that a Support Vector Machine (SVM) seems to perform best with this dataset. Even though SVM with RBF kernel has a fit time complexity more than quadratic, for a small dataset such as this it's not a problem. However if the dataset was bigger, I'd consider switching to a linear model such as SVMLinear or SGDRegressor.
 
 |           | MAE       | RMSE       |
 |-----------|-----------|------------|
@@ -48,5 +48,6 @@ python main.py
 | DecTree   | 7.421035  | 45.788963  |
 | KNN       | 14.366465 | 91.609868  |
 | SVM       | 0.121549  | 0.165607   |
+| SGD       | 13.178861 | 26.666739  |
 
 * Next steps are SVM hyperparameter tuning. 
